@@ -8,7 +8,6 @@ const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Register
 router.post('/register', [
   body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
   body('email').isEmail().withMessage('Please provide a valid email'),
@@ -23,7 +22,7 @@ router.post('/register', [
 
     const { name, email, password, role, specialty, experience, city } = req.body;
 
-    // Check if user already exists
+    // Check if user already exists on the database
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists with this email' });
