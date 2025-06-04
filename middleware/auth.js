@@ -1,3 +1,5 @@
+
+// middleware/auth.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -19,9 +21,26 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
     res.status(401).json({ message: 'Token is not valid' });
   }
 };
 
-module.exports = { auth };
+const adminAuth = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied. Admin only.' });
+  }
+  next();
+};
+
+const doctorAuth = (req, res, next) => {
+  if (req.user.role !== 'doctor' && req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied. Doctor only.' });
+  }
+  next();
+};
+
+module.exports = { auth, adminAuth, doctorAuth };
+
+
+
+

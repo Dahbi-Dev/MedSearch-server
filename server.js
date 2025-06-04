@@ -6,8 +6,10 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  credentials: true
+}));app.use(express.json());
 
 let dbConnected = false; // 👈 track DB status
 
