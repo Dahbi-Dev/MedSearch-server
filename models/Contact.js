@@ -1,8 +1,7 @@
-
 // models/Contact.js
 const mongoose = require('mongoose');
 
-const contactSchema = new mongoose.Schema({
+const contactSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -11,19 +10,34 @@ const contactSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    lowercase: true,
     trim: true
   },
   message: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  userRole: {
     type: String,
     required: true
   },
   status: {
     type: String,
-    enum: ['pending', 'responded', 'resolved'],
+    enum: ['pending', 'read', 'responded'],
     default: 'pending'
   },
-  response: String,
+  adminResponse: {
+    type: String,
+    trim: true
+  },
+  respondedAt: {
+    type: Date
+  },
   respondedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
