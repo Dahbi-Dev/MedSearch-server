@@ -8,11 +8,21 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
+const allowedOrigins = ['http://localhost:5173', 'https://med-search-v1.vercel.app'];
+
 app.use(cors({
-  origin: 'http://localhost:5173', // Your frontend URL
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+
 
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
