@@ -48,6 +48,7 @@ app.get('/', (req, res) => {
       <body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
         <h1>FindDoctor Server</h1>
         <p>Status: ${statusCircle} ${dbConnected ? 'Connected to MongoDB' : 'Not connected to MongoDB'}</p>
+        <p>Authentication: Enabled</p>
         <p>Image uploads: Enabled</p>
         <p>Static files served from: /uploads</p>
       </body>
@@ -60,13 +61,27 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/doctors', require('./routes/doctors'));
 app.use('/api/blogs', require('./routes/blogs'));
 app.use('/api/contact', require('./routes/contact'));
+app.use('/api/blogs', require('./routes/blogs'));
 
 // Error handling middleware
 app.use((error, req, res, next) => {
-  if (error instanceof multer.MulterError) {
-    if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ message: 'File too large. Maximum size is 5MB.' });
-    }
+  // Handle Multer errors (file upload errors)
+  if (error.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'File too large. Maximum size is 5MB.' });
+  }
+  
+  // Handle validation errors
+  if (error.name === 'ValidationError') {
+    return res.status(400).json({ message: error.message });
+  }
+  
+  // Handle JWT errors
+  if (error.name === 'JsonWebTokenError') {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+  
+  if (error.name === 'TokenExpiredError') {
+    return res.status(401).json({ message: 'Token expired' });
   }
   
   console.error('Unhandled error:', error);
@@ -81,5 +96,6 @@ app.use('*', (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Auth routes available at: http://localhost:${PORT}/api/auth`);
   console.log(`Static files served from: ${path.join(__dirname, 'uploads')}`);
 });

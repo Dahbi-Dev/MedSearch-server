@@ -1,4 +1,3 @@
-
 // routes/auth.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -113,6 +112,24 @@ router.post('/login', [
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Logout
+router.post('/logout', auth, async (req, res) => {
+  try {
+    // Optional: Log the logout activity
+    console.log(`User ${req.user.name} (${req.user.email}) logged out at ${new Date().toISOString()}`);
+    
+    // Since we're using JWT (stateless), the actual logout happens on the client side
+    // by removing the token from localStorage. This endpoint confirms the logout.
+    res.json({ 
+      message: 'Logged out successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ message: 'Server error during logout' });
   }
 });
 
